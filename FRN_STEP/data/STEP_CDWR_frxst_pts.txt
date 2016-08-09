@@ -1,0 +1,42 @@
+FOUFOUCO,INVALID,Regulated Front Rang
+TROWESCO,VALID,Front Range
+CHERRYCO,VALID,Front Range
+COCREPCO,VALID,Front Range
+BLUGRECO,could not validate, 
+BOCOROCO,INVALID,Regulated Front Range
+SSVWARCO,VALID,Front Range
+BFCLYOCO,INVALID,canal
+BTABESCO,VALID,Front Range
+FOUNCOCO,VALID,Front Range
+ARKENLCO,could not validate,
+BIGDHICO,VALID,Front Range suburban housing
+CLEGOLCO,INVALID,Regulated Front Range
+BIGDWECO,could not validate,
+FRMLMRCO,VALID,Front Range
+PLASPICO,High Mountain,Regulated
+CHENEFCO,VALID,Front Range 
+BLUDILCO,INVALID,Regulated
+WFCEMPCO,High Mountain,Wests Fork Clear Creek Abv Empire
+BOCELSCO,INVALID,Regulated 
+COLKRECO,INVALID,Regulated
+TROUBLCO,could not validate,
+COLNGBCO,INVALID,Regulated
+LTCBERCO,could not validate,
+HFCBBSCO,,
+ARKBGNCO,INVALID,Regulated
+HOMGOLCO,INVALID,Regulated
+FIRBUCCO,VALID,Front Range suburban housing
+WILLEACO,High Mountain,west slope
+BOCMIDCO,High Mountain,
+LEFCRECO,VALID,Front Range
+WESSHRCO,VALID,Front Range
+PLAWATCO,INVALID,Regulated Front Range
+BCROUTCO,INVALID,Regulated Front Range
+RALARECO,could not validate,
+SPACHECO,INVALID,Regulated Front Range
+PLUTIRCO,could not validate,
+MIDSTECO,VALID,Front Range
+STALENCO,, 
+MIDSTECO,VALID,Front Range
+FISHESCO,could not validate,
+CLAFTCCO,INVALID,Regulated Front Range
