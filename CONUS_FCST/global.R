@@ -6,22 +6,42 @@ library(png)
 load("data/masterUsgsMetadata.Rdata")
 
 # Plot Specs
-globalPlotDir <- '/d7/adugger/WRF_Hydro/InspGadget/CONUS_FCST/plots/'
+#globalPlotDir <- '/d7/adugger/WRF_Hydro/InspGadget/CONUS_FCST/plots/'
+#globalPlotDir <- '/glade/p/ral/RHAP/arezoo/InspGadget/CONUS_FCST/plots/' #A
+globalPlotDir <- '/glade/p/ral/RHAP/adugger/CONUS_IOC/real_time_plots/'
+
 prefList <- list(short="/FCST/short/",
                  medium="/FCST/medium/",
                  long="/FCST/long/",
                  retro="/RETRO/5yr/",
-                 ol="/ANALYSIS/")
+                 ol="/ANALYSIS/",
+                 mapshort="/MAP_FCST/short/",
+                 mapmedium="/MAP_FCST/medium/",
+                 maplong="/MAP_FCST/long/",
+                 mapol="/MAP_ANALYSIS/")
+
 suff1List <- list(short="_short_range_plot",
                  medium="_medium_range_plot",
                  long="_long_range_plot",
                  retro="_5yr_retro",
-                 ol="_openloop")
+                 ol="_openloop",
+                 mapshort="_short_range_plot",
+                 mapmedium="_medium_range_plot",
+                 maplong="_long_range_plot",
+                 mapol="_open_loop_plot")
+
 suff2List <- list(fcsttime=".byFcstTime",
                  leadtime=".byLeadTime",
                  none="")
+
 suff3List <- list(standard=".Linear.png",
                  log=".Log.png")
+
+suff4List <- list(intervening=".intervening", #A
+                  contributing=".contributing")  #A
+
+suff5List <- list(accum=".acc", #A
+                  noAccum=".noacc")  #A
 
 # Graphics
 gageIcons <- iconList(red = makeIcon("marker_darkred.png", iconWidth = 24, iconHeight =32),
@@ -52,6 +72,17 @@ plotType <- function(x, plottype, axistype, plotdir, fcstplottyp) {
          "standard_fcsttime" = paste0(plotdir, prefList[[plottype]], x, suff1List[[plottype]], suff2List[[fcstplottyp]], suff3List[[axistype]]),
          "log_leadtime" = paste0(plotdir, prefList[[plottype]], x, suff1List[[plottype]], suff2List[[fcstplottyp]], suff3List[[axistype]]),
          "standard_leadtime" = paste0(plotdir, prefList[[plottype]], x, suff1List[[plottype]], suff2List[[fcstplottyp]], suff3List[[axistype]]))
+}
+
+# Function to get plot path for MAP
+MapPlotType <- function(x, plottype, axistype, plotdir, fcstplottyp, areatyp, acctyp ){
+#  axistype_full <- paste0(axistype, "_", fcstplottyp)
+  if (plottype == "mapol") fcstplottyp <- "none"
+#  if (plottype == "long") {
+#        axistype <- "standard"
+#        fcstplottyp <- "fcsttime"
+#  }
+   paste0(plotdir, prefList[[plottype]], x, suff1List[[plottype]], suff2List[[fcstplottyp]], suff4List[[areatyp]], suff5List[[acctyp]], suff3List[[axistype]])
 }
 
 
@@ -112,11 +143,22 @@ ui <-  fluidPage(
                 radioButtons("radioLog", label = "Plot Y Scale:",
                         choices = list("Standard" = "standard", "Log" = "log"), 
                         selected = "standard", inline=TRUE)),
-             column(9,
+             column(3,
 # FCST PLOT TYPE
-                radioButtons("radioPlotTyp", label="Forecast Plot Type:", 
+                radioButtons("radioPlotTyp", label="Forecast Plot Type:",
                         choices = list("By Forecast Time" = "fcsttime", "By Lead Time" = "leadtime"),
-                        selected = "fcsttime", inline=TRUE))
+                        selected = "fcsttime", inline=TRUE)),
+
+             column(3,
+# MAP Area Type
+                radioButtons("radioMapArea", label="MAP Area Type:",
+                        choices = list("Contributing" = "contributing", "Intervening" = "intervening"),
+                        selected = "contributing", inline=TRUE)),
+             column(3,
+# Accumulation ON/OFF for MAP
+                radioButtons("radioAccTyp", label="MAP Display:",
+                        choices = list("Accumulated" = "accum", "Not Accumulated" = "noAccum"),
+                        selected = "noAccum", inline=TRUE))
              ),
 # PLOT SOURCE DIRECTORY
           textInput("plotDir", "Plot Directory:", 
@@ -151,19 +193,22 @@ ui <-  fluidPage(
                       wellPanel(imageOutput("fcstLong", width="100%", height="50%")),
                       p(verbatimTextOutput("fcstLongPath"))                   
                     )
-                  )
-               )
-             ),
-# BOTTOM FRAME
-             tabsetPanel(selected="OPEN LOOP",
+                  )               
+               ),
                tabPanel("OPEN LOOP",
                   fluidRow(
                     column(12,
-                      wellPanel(imageOutput("analOL", width="100%", height="50%")),
-                      p(verbatimTextOutput("analOLPath"))
+                      wellPanel(imageOutput("analOL_top", width="100%", height="50%")),
+                      p(verbatimTextOutput("analOLPath_top"))
                     )
                   )
-               ),
+               )
+             )  
+           )
+    ),
+  fluidRow(
+     column(6,
+           tabsetPanel(selected="RETROSPECTIVE",
                tabPanel("RETROSPECTIVE",
                   fluidRow(
                     column(12,
@@ -172,10 +217,56 @@ ui <-  fluidPage(
                     )
                   )
                )
-             )  
-          )
-      )
-    ),
+             )
+          ),
+     column(6,
+           tabsetPanel(selected="OPEN LOOP",
+               tabPanel("MAP-SHORT-RANGE",
+                  fluidRow(
+                    column(12,
+                      #wellPanel(a(imageOutput("fcstShort", width="100%", height="50%"), target="_blank", href=verbatimTextOutput("fcstShortPath")))
+                      wellPanel(imageOutput("MAPfcstShort", width="100%", height="50%")),
+                      p(verbatimTextOutput("MAPfcstShortPath"))
+                    )
+                  )
+               ),
+               tabPanel("MAP-MED-RANGE",
+                  fluidRow(
+                    column(12,
+                      wellPanel(imageOutput("MAPfcstMed", width="100%", height="50%")),
+                      p(verbatimTextOutput("MAPfcstMedPath"))
+                    )
+                  )
+               ),
+               tabPanel("MAP-LONG-RANGE",
+                  fluidRow(
+                    column(12,
+                      wellPanel(imageOutput("MAPfcstLong", width="100%", height="50%")),
+                      p(verbatimTextOutput("MAPfcstLongPath"))
+                    )
+                  )
+               ),
+              tabPanel("MAP-OPEN LOOP",
+                  fluidRow(
+                    column(12,
+                      wellPanel(imageOutput("MAPanalOL", width="100%", height="50%")),
+                      p(verbatimTextOutput("MAPanalOLPath"))
+                    )
+                  )
+               ),
+              tabPanel("OPEN LOOP",
+                  fluidRow(
+                    column(12,
+                      wellPanel(imageOutput("analOL", width="100%", height="50%")),
+                      p(verbatimTextOutput("analOLPath"))
+                    )
+                  )
+               )
+             )
+           )
+    ) # THis is the end of the second fluidRow I added to see how it works
+), # This is the end of the first tabPanel (MAP)
+
 # MASTER TAB STATS
     tabPanel("STATISTICS",
        tabsetPanel(
@@ -573,6 +664,34 @@ server <- function(input,output){
           path <- plotType(n, "retro", input$radioLog, input$plotDir, input$radioPlotTyp)
           list(src=path,contentType = "image/png")}, deleteFile = FALSE)
         output$analRetro5yrPath <- renderText({plotType(n, "retro", input$radioLog, input$plotDir, input$radioPlotTyp)})
+
+
+        # Gather all the plot info Arezoo added (MAP plots, and a duplicate of open_loo
+
+        output$MAPfcstShort <- renderImage({
+          path <- MapPlotType(n, "mapshort", input$radioLog, input$plotDir, input$radioPlotTyp, input$radioMapArea, input$radioAccTyp)
+          list(src=path,contentType = "image/png")}, deleteFile = FALSE)
+        output$MAPfcstShortPath <- renderText({MapPlotType(n, "mapshort", input$radioLog, input$plotDir, input$radioPlotTyp, input$radioMapArea, input$radioAccTyp)})
+        output$MAPfcstMed <- renderImage({
+          path <- MapPlotType(n, "mapmedium", input$radioLog, input$plotDir, input$radioPlotTyp, input$radioMapArea, input$radioAccTyp)
+          list(src=path,contentType = "image/png")}, deleteFile = FALSE)
+          output$MAPfcstMedPath <- renderText({MapPlotType(n, "mapmedium", input$radioLog, input$plotDir, input$radioPlotTyp, input$radioMapArea, input$radioAccTyp)})
+        output$MAPfcstLong <- renderImage({
+          path <- MapPlotType(n, "maplong", input$radioLog, input$plotDir, input$radioPlotTyp, input$radioMapArea, input$radioAccTyp)
+          list(src=path,contentType = "image/png")}, deleteFile = FALSE)
+          output$MAPfcstLongPath <- renderText({MapPlotType(n, "maplong", input$radioLog, input$plotDir, input$radioPlotTyp, input$radioMapArea, input$radioAccTyp)})
+
+        output$MAPanalOL <- renderImage({
+          path <- MapPlotType(n, "mapol", input$radioLog, input$plotDir, input$radioPlotTyp, input$radioMapArea, input$radioAccTyp)
+          list(src=path,contentType = "image/png")}, deleteFile = FALSE)
+        output$MAPanalOLPath <- renderText({MapPlotType(n, "mapol", input$radioLog, input$plotDir, input$radioPlotTyp, input$radioMapArea, input$radioAccTyp)})
+
+        output$analOL_top <- renderImage({
+          path <- plotType(n, "ol", input$radioLog, input$plotDir, input$radioPlotTyp)
+          list(src=path,contentType = "image/png")}, deleteFile = FALSE)
+        output$analOLPath_top <- renderText({plotType(n, "ol", input$radioLog, input$plotDir, input$radioPlotTyp)})
+
+       
      }
 
   # GAGE ID SELECTION
